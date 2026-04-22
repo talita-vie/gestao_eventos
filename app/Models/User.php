@@ -3,19 +3,44 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\EducationLevel;
+use App\Enums\UserRole;
+use App\Notifications\ResetPasswordNotification;
+use App\Notifications\VerifyEmailNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
+
+    use SoftDeletes;
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'cpf',
+        'role',
+        'phone',
+        'institution',
+        'education_level',
+        'address_id'
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token'
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -26,7 +51,36 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
+            'education_level' => EducationLevel::class
         ];
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmailNotification());
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $url = env('APP_URL').'/reset-password?token='.$token;
+        $this->notify(new ResetPasswordNotification($url));
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class, 'organizer_id');
+    }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
+    }
+
+    public function address(): BelongsTo
+    {
+        return $this->belongsTo(Address::class);
     }
 }
