@@ -12,7 +12,11 @@ class Certificate extends Model
     protected $fillable = [
         'registration_id',
         'validation_code',
-        'file_path',
+        'event_title_snapshot',
+        'event_start_date_snapshot',
+        'event_end_date_snapshot',
+        'event_hours_snapshot',
+        'participant_name_snapshot',
         'issue_date'
     ];
 

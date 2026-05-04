@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->unique()->constrained();
+            $table->foreignId('registration_id')->unique()->constrained()->cascadeOnDelete();
             $table->string('validation_code')->unique();
-            $table->string('file_path');
+            $table->string('event_title_snapshot');
+            $table->string('event_start_date_snapshot');
+            $table->string('event_end_date_snapshot');
+            $table->string('event_hours_snapshot');
+            $table->string('participant_name_snapshot');
             $table->dateTime('issue_date');
             $table->timestamps();
             $table->softDeletes();
