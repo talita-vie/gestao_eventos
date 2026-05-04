@@ -16,8 +16,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('event_id')->constrained();
+            $table->unique(['user_id', 'event_id']);
             $table->boolean('status_checkin')->default(false);
-            $table->enum('payment_status', array_column(PaymenStatus::cases(), 'value'))->default(PaymenStatus::PENDING->value);
+            $table->enum('payment_status', array_column(PaymenStatus::cases(), 'value'))->default(PaymenStatus::FREE->value);
             $table->timestamps();
             $table->softDeletes();
         });

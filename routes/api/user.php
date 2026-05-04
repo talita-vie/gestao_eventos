@@ -2,20 +2,18 @@
 
 use App\Http\Controllers\Address\AddressController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Certificate\CertificateController;
 use App\Http\Controllers\Event\EventController;
+use App\Http\Controllers\Registration\RegistrationController;
 use App\Http\Controllers\User\UserController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/users', function () {
-    return User::all();
-});
-
 Route::get('/logout', [LogoutController::class, 'logout'])->name('logout');
 
-Route::resource('events', EventController::class)->only(['index', 'show', 'store']);
+Route::apiResource('events', EventController::class)->only(['index', 'show', 'store']);
 
-Route::resource('address', AddressController::class)->except(['index']);
+Route::apiResource('address', AddressController::class)->except(['index']);
 Route::prefix('addresses')->group(function() {
     Route::get('/me', [AddressController::class, 'myAddress'])->name('myAddress');
     Route::patch('/{id}/restore', [AddressController::class, 'restoreAddress'])->name('restoreAddress');
@@ -27,4 +25,14 @@ Route::prefix('profile')->group(function () {
     Route::put('/update-info', [UserController::class, 'updateInfo'])->name('profile.updateInfo');
     Route::put('/update-address', [UserController::class, 'updateAddress'])->name('profile.updateAddress');
     Route::delete('/delete', [UserController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::apiResource('events.registrations', RegistrationController::class)
+                                            ->except(['update', 'show'])
+                                            ->shallow()
+                                            ->withTrashed(['destroy']);
+
+Route::prefix('certificate')->group(function() {
+    Route::get('/me', [CertificateController::class, 'allCertificates'])->name('allCertificates');
+    Route::get('/{certificate}/view', [CertificateController::class, 'viewCertificate'])->name('viewCertificate');
 });

@@ -21,7 +21,8 @@ class Registration extends Model
     protected function casts()
     {
         return [
-            'payment_status' => PaymenStatus::class
+            'payment_status' => PaymenStatus::class,
+            'status_checkin' => 'boolean'
         ];
     }
 
