@@ -8,4 +8,5 @@ enum StatusEvent: string
     case PUBLISHED = 'published';
     case PAUSED = 'paused';
     case CANCELED = 'canceled';
+    case FINISHED = 'finished';
 }

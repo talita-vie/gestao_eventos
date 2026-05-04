@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\StatusEvent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,7 @@ class Event extends Model
     protected $fillable = [
         'name',
         'description',
+        'banner_path',
         'start_date_time',
         'end_date_time',
         'category_id',
@@ -40,7 +42,7 @@ class Event extends Model
         ];
     }
 
-    public function scopePublished($query)
+    public function scopePublished(Builder $query)
     {
         return $query->where('status', StatusEvent::PUBLISHED->value);
     }
