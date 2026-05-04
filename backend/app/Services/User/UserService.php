@@ -37,7 +37,7 @@ class UserService
 
             if ($addressOldId) {
                 $residents = User::where('address_id', $addressOldId)->count();
-
+                //nesse caso, talvez fosse bom apagar de vez
                 if($residents === 0) {
                     Address::findOrFail($addressOldId)->delete();
                 }

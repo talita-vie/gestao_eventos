@@ -40,6 +40,7 @@ class AddressService
     public function StoreAddress(array $data) 
     {
         try {
+            // associar endereços criados separadamentes ao usuario, senão eu não consigo relacionar com um evento
             $cep = $data['street_zipcode'];
             $data['street_zipcode'] = substr($cep, 0, 5) . substr($cep, 6, 3);
             $address = Address::create($data);
