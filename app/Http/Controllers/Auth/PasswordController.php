@@ -19,9 +19,7 @@ class PasswordController extends Controller
         try {
             $email = $request->validated();
             $result = $this->authService->sendResetLinkEmail($email);
-            return $this->sendResponse($result, 'Email para resetar senha enviado com sucesso!');
-        } catch (HttpException $e){
-            return $this->sendError('', [0 => $e->getMessage()], Response::HTTP_TOO_MANY_REQUESTS);
+            return $this->sendResponse($result, 'Se email estiver cadastrado, um novo link de resetar senha foi enviado!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }

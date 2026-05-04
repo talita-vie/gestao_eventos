@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Models\PersonalAccessToken;
 use App\Models\User;
+use ErrorException;
 use Exception;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\DB;
@@ -90,10 +91,11 @@ class AuthService
 
     public function sendResetLinkEmail(array $data) {
         $status = Password::sendResetLink($data);
+
         if ($status !== Password::ResetLinkSent) {
-            throw new HttpException(429, __($status));
+            throw new ErrorException('Se email estiver cadastrado, um novo link de resetar senha foi enviado!');
         }
-            
+        
         return response()->json([
             'message' => __($status)
         ], 200);
