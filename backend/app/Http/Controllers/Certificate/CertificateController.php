@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Certificate;
 use App\Services\Certificate\CertificateService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CertificateController extends Controller
 {
@@ -26,6 +27,7 @@ class CertificateController extends Controller
 
     public function viewCertificate(Certificate $certificate)
     {
+        Gate::authorize('view', $certificate);
         try {
             $result = $this->certificateService->viewCertificate($certificate);
             return $this->sendResponse($result, 'Certificado encontrado com sucesso.');
