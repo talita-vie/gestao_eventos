@@ -13,10 +13,10 @@ Route::apiResource('event', EventController::class)->only(['update', 'destroy'])
 Route::prefix('events')->group(function() {
     Route::get('/me', [EventController::class, 'myEvents'])->name('myEvents');
     Route::get('/trashed', [EventController::class, 'myDeletedEvents'])->name('myDeletedEvents');
-    Route::patch('/{id}/restore', [EventStatusController::class, 'restoreEvent'])->name('restoreEvent');
-    Route::patch('/{id}/publish', [EventStatusController::class, 'publishEvent'])->name('publishEvent');
-    Route::patch('/{id}/paused', [EventStatusController::class, 'pausedEvent'])->name('pausedEvent');
-    Route::patch('/{id}/canceled', [EventStatusController::class, 'canceledEvent'])->name('canceledEvent');
+    Route::patch('/{event}/restore', [EventStatusController::class, 'restoreEvent'])->name('restoreEvent')->withTrashed();
+    Route::patch('/{event}/publish', [EventStatusController::class, 'publishEvent'])->name('publishEvent');
+    Route::patch('/{event}/paused', [EventStatusController::class, 'pausedEvent'])->name('pausedEvent');
+    Route::patch('/{event}/canceled', [EventStatusController::class, 'canceledEvent'])->name('canceledEvent');
     Route::post('/{event}/banner', [EventMediaController::class, 'bannerEvent'])->name('bannerEvent');
     Route::delete('/{event}/banner-delete', [EventMediaController::class, 'bannerDeleteEvent'])->name('bannerDeleteEvent');
     

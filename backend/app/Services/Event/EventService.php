@@ -3,6 +3,7 @@
 namespace App\Services\Event;
 
 use App\Enums\UserRole;
+use App\Models\Address;
 use App\Models\Event;
 use App\Models\User;
 use Exception;
@@ -40,24 +41,32 @@ class EventService
             $events = Event::onlyTrashed()
                             ->where('organizer_id', $user->id)
                             ->get();
+            
             return $events;
         } catch (\Throwable $th) {
             throw $th;
         }
     }
 
-    public function eventStore(array $data) 
+    public function eventStore(array $dataEvent, array $dataAddress, User $user) 
     {
-        // mudar logica, não mandar o organizer_id pela requisição, mas usar o request
-        return DB::Transaction(function() use($data) {
-            $user = User::findOrFail($data['organizer_id']);
-            $user->update([
-                'role' => UserRole::ORGANIZER->value
-            ]);
+        return DB::Transaction(function() use($dataEvent, $dataAddress, $user) {
+            if($user->role->value !== UserRole::ADMIN->value) {
+                $user->update([
+                    'role' => UserRole::ORGANIZER->value
+                ]);
+            }
 
-            $event = Event::create($data);
+            $dataEvent['organizer_id'] = $user->id;
+            $cep = $dataAddress['street_zipcode'];
+            $dataAddress['street_zipcode'] = substr($cep, 0, 5) . substr($cep, 6, 3);
+            $address = Address::create($dataAddress);
 
-            return $event;
+            $dataEvent['address_id'] = $address->id;
+
+            $event = Event::create($dataEvent);
+
+            return $event->load('address');
         });
 
     }
@@ -69,11 +78,10 @@ class EventService
         } catch (\Throwable $th) {
             throw $th;
         }
-    } 
+    }
 
-    public function updateEvent(string $id, array $data) {
+    public function updateEvent(Event $event, array $data) {
         try {
-            $event = Event::findOrFail($id);
             $event->update($data);
             return $event;
 
@@ -82,9 +90,8 @@ class EventService
         }
     }
 
-    public function deleteEvent(string $id) {
+    public function deleteEvent(Event $event) {
         try {
-            $event = Event::findOrFail($id);
             $event->delete();
             return $event;
 

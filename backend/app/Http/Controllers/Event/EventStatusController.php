@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Registration;
 use App\Services\Event\EventLifecycleService;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class EventStatusController extends Controller
 {
@@ -16,43 +16,58 @@ class EventStatusController extends Controller
         
     }
 
-    public function restoreEvent(string $id) {
+    public function restoreEvent(Event $event) 
+    {
+        Gate::authorize('lifeCycle', $event);
+
         try {
-            $result = $this->eventLifecycleService->restoreEvent($id);
+            $result = $this->eventLifecycleService->restoreEvent($event);
             return $this->sendResponse($result, 'Evento restaurado com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }
     }
 
-    public function publishEvent(string $id) {
+    public function publishEvent(Event $event) 
+    {
+        Gate::authorize('lifeCycle', $event);
+
         try {
-            $result = $this->eventLifecycleService->publishEvent($id);
+            $result = $this->eventLifecycleService->publishEvent($event);
             return $this->sendResponse($result, 'Evento publicado com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }
     }
 
-    public function pausedEvent(string $id) {
+    public function pausedEvent(Event $event) 
+    {
+        Gate::authorize('lifeCycle', $event);
+
         try {
-            $result = $this->eventLifecycleService->pausedEvent($id);
+            $result = $this->eventLifecycleService->pausedEvent($event);
             return $this->sendResponse($result, 'Evento pausado com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }
     }
 
-    public function canceledEvent(string $id) {
+    public function canceledEvent(Event $event) 
+    {
+        Gate::authorize('lifeCycle', $event);
+
         try {
-            $result = $this->eventLifecycleService->canceledEvent($id);
+            $result = $this->eventLifecycleService->canceledEvent($event);
             return $this->sendResponse($result, 'Evento cancelado com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }
     }
 
-    public function participantsEvent(Event $event) {
+    public function participantsEvent(Event $event) 
+    {
+        Gate::authorize('lifeCycle', $event);
+
         try {
             $result = $this->eventLifecycleService->participantsEvent($event);
             return $this->sendResponse($result, 'Usuários do evento encontrados com sucesso!');
@@ -61,7 +76,10 @@ class EventStatusController extends Controller
         }
     }
 
-    public function checkinParticipants(Registration $registration) {
+    public function checkinParticipants(Registration $registration) 
+    {
+        Gate::authorize('checkin', $registration);
+
         try {
             $result = $this->eventLifecycleService->checkinParticipants($registration);
             return $this->sendResponse($result, 'Check-in do participante feito com sucesso!');
@@ -70,7 +88,10 @@ class EventStatusController extends Controller
         }
     }
 
-    public function deleteCheckinParticipants(Registration $registration) {
+    public function deleteCheckinParticipants(Registration $registration) 
+    {
+        Gate::authorize('deleteCheckin', $registration);
+
         try {
             $result = $this->eventLifecycleService->deleteCheckinParticipants($registration);
             return $this->sendResponse($result, 'Check-in do participante excluido com sucesso!');
@@ -81,6 +102,8 @@ class EventStatusController extends Controller
 
     public function finishEvent(Event $event)
     {
+        Gate::authorize('lifeCycle', $event);
+
         try {
             $result = $this->eventLifecycleService->finishEvent($event);
             return $this->sendResponse($result, 'Evento finalizado com sucesso!');

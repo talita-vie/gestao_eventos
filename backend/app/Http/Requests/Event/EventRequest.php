@@ -15,6 +15,21 @@ class EventRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        if ($this->has('address.street_zipcode')) {
+            $cepLimpo = preg_replace('/[^0-9]/', '', $this->address['street_zipcode']);
+
+            if (strlen($cepLimpo) === 8) {
+                $cepFormatado = substr($cepLimpo, 0, 5) . '-' . substr($cepLimpo, 5, 3);
+
+                $this->merge([
+                    'address.street_zipcode' => $cepFormatado
+                ]);
+            }
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -75,16 +90,60 @@ class EventRequest extends FormRequest
                 'integer',
                 'exists:events,id'
             ],
-            'organizer_id' => [
+            'address' => [
                 'required',
-                'integer',
-                'exists:users,id'
+                'array'
             ],
-            'address_id' => [
+            'address.street_name' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'address.neighborhood' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'address.city_name' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'address.state' => [
+                'required',
+                'string',
+                'max:2',
+                'uf'
+            ],
+            'address.house_number' => [
+                'required',
+                'string',
+                'max:20'
+            ],
+            'address.street_zipcode' => [
+                'required',
+                'string',
+                'formato_cep'
+            ],
+            'address.complement' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'address.reference_point' => [
                 'nullable',
-                'integer',
-                'exists:addresses,id'
+                'string'
             ]
         ];
+    }
+
+    public function getEventData()
+    {
+        return $this->except('address');
+    }
+
+    public function getAddressData()
+    {
+        return $this->input('address');
     }
 }

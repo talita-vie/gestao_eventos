@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Event;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Event\EventRequest;
+use App\Models\Event;
 use App\Services\Event\EventService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class EventController extends Controller
 {
@@ -44,8 +47,10 @@ class EventController extends Controller
     public function store(EventRequest $request) 
     {
         try {
-            $data = $request->validated();
-            $result = $this->eventService->eventStore($data);
+            $dataEvent = $request->getEventData();
+            $dataAddress = $request->getAddressData();
+            $user = $request->user();
+            $result = $this->eventService->eventStore($dataEvent, $dataAddress, $user);
             return $this->sendResponse($result, 'Evento criado com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
@@ -61,21 +66,25 @@ class EventController extends Controller
         }
     }
 
-    public function update(string $id, EventRequest $request) 
+    public function update(Event $event, EventRequest $request) 
     {
+        Gate::authorize('update', $event);
+
         try {
             $data = $request->validated();
-            $result = $this->eventService->updateEvent($id, $data);
+            $result = $this->eventService->updateEvent($event, $data);
             return $this->sendResponse($result, 'Evento atualizado com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }
     }
 
-    public function destroy(string $id) 
+    public function destroy(Event $event) 
     {
+        Gate::authorize('delete', $event);
+
         try {
-            $result = $this->eventService->deleteEvent($id);
+            $result = $this->eventService->deleteEvent($event);
             return $this->sendResponse($result, 'Evento excluido com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);

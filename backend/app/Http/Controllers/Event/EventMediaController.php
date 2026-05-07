@@ -7,6 +7,7 @@ use App\Http\Requests\Event\UploadBannerRequest;
 use App\Models\Event;
 use App\Services\Event\EventMediaService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class EventMediaController extends Controller
 {
@@ -18,6 +19,8 @@ class EventMediaController extends Controller
 
     public function bannerEvent(UploadBannerRequest $request, Event $event)
     {
+        Gate::authorize('lifeCycle', $event);
+
         try {
             $data = $request->validated();
             $result = $this->eventMediaService->bannerEvent($event, $data['banner']);
@@ -29,6 +32,8 @@ class EventMediaController extends Controller
 
     public function bannerDeleteEvent(Event $event)
     {
+        Gate::authorize('lifeCycle', $event);
+        
         try {
             $result = $this->eventMediaService->bannerDeleteEvent($event);
             return $this->sendResponse($result, 'Banner atualizado com sucesso');

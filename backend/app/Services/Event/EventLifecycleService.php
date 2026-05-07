@@ -12,17 +12,14 @@ use Illuminate\Support\Str;
 
 class EventLifecycleService
 {
-    public function restoreEvent(string $id) 
+    public function restoreEvent(Event $event) 
     {
-        $event = Event::withTrashed()->findOrFail($id);
         $event->restore();
         return $event;
     }
 
-    public function publishEvent(string $id) 
+    public function publishEvent(Event $event) 
     {
-        $event = Event::findOrFail($id);
-
         if($event->status->value === StatusEvent::PUBLISHED->value) {
             throw new Exception('Esse evento já está publicado.');
         }
@@ -43,10 +40,8 @@ class EventLifecycleService
         return $event;
     }
 
-    public function pausedEvent(string $id) 
+    public function pausedEvent(Event $event) 
     {
-        $event = Event::findOrFail($id);
-
         if(in_array($event->status->value, [StatusEvent::DRAFT->value, StatusEvent::CANCELED->value])) {
             throw new Exception('Não é possível pausar um evento que não foi publicado ou foi cancelado.');
         }
@@ -66,10 +61,8 @@ class EventLifecycleService
         return $event;
     }
 
-    public function canceledEvent(string $id) 
+    public function canceledEvent(Event $event) 
     {
-        $event = Event::findOrFail($id);
-
         if($event->status->value === StatusEvent::DRAFT->value) {
             throw new Exception('Não é possível cancelar um evento que não foi publicado');
         }
