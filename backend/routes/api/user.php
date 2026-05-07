@@ -13,7 +13,7 @@ Route::get('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::apiResource('events', EventController::class)->only(['index', 'show', 'store']);
 
-Route::apiResource('address', AddressController::class)->except(['index']);
+Route::apiResource('address', AddressController::class)->except(['index', 'store']);
 Route::prefix('addresses')->group(function() {
     Route::get('/me', [AddressController::class, 'myAddress'])->name('myAddress');
     Route::patch('/{id}/restore', [AddressController::class, 'restoreAddress'])->name('restoreAddress');

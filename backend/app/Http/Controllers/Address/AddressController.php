@@ -19,7 +19,7 @@ class AddressController extends Controller
      */
     public function index()
     {
-        //
+        // Implementar depois para o admin
     }
 
     public function myAddress(Request $request) 
@@ -37,20 +37,6 @@ class AddressController extends Controller
         try {
             $result = $this->addressService->myDeletedAddress($request->user());
             return $this->sendResponse($result, 'Meus endereços apagados recuperados com sucesso');
-        } catch (\Throwable $th) {
-            return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(AddressRequest $request)
-    {
-        try {
-            $data = $request->validated();
-            $result = $this->addressService->StoreAddress($data);
-            return $this->sendResponse($result, 'Endereço criado com sucesso');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }
