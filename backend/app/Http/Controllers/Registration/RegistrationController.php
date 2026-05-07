@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Registration;
 use App\Services\Registration\RegistrationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RegistrationController extends Controller
 {
@@ -20,6 +21,7 @@ class RegistrationController extends Controller
      */
     public function index(Event $event)
     {
+        Gate::authorize('view', $event);
         try {
             $result = $this->registrationService->indexRegistration($event);
             return $this->sendResponse($result, 'Inscrições encontradas com sucesso.');
@@ -47,6 +49,7 @@ class RegistrationController extends Controller
      */
     public function destroy(Request $request, Registration $registration)
     {
+        Gate::authorize('delete', $registration);
         try {
             $user = $request->user();
             $result = $this->registrationService->deleteRegistration($user, $registration);

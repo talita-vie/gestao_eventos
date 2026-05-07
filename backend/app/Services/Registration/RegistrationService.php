@@ -19,7 +19,10 @@ class RegistrationService
 
     public function storeRegistration(User $user, Event $event)
     {
-        $registrationWithTrash = $event->registrations()->withTrashed()->where('user_id', $user->id)->first();
+        $registrationWithTrash = $event->registrations()
+                                ->withTrashed()
+                                ->where('user_id', $user->id)
+                                ->first();
         
         if ($registrationWithTrash) {
             if ($registrationWithTrash->trashed()) {
@@ -42,7 +45,9 @@ class RegistrationService
             throw new Exception('O período de inscrição nesse evento acabou.');
         }
 
-        // fazer logica se o evento é interno ou não
+        
+
+        // fazer logica se o evento é interno ou não -> dd('User: ', $user->institution);
 
         // fazer logica se o evento foi pago
 
