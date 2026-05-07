@@ -4,7 +4,6 @@ namespace App\Services\Auth;
 
 use App\Models\PersonalAccessToken;
 use App\Models\User;
-use ErrorException;
 use Exception;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +12,6 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 class AuthService
@@ -89,19 +87,17 @@ class AuthService
         $token->delete();
     }
 
+    // verificar como melhorar essa return
     public function sendResetLinkEmail(array $data) {
         $status = Password::sendResetLink($data);
-
-        if ($status !== Password::ResetLinkSent) {
-            throw new ErrorException('Se email estiver cadastrado, um novo link de resetar senha foi enviado!');
-        }
         
         return response()->json([
-            'message' => __($status)
+            'messeage' => __($status)
         ], 200);
 
     }
 
+    // verificar como melhorar essa return
     public function resetPassword(array $data) {
         DB::beginTransaction();
             $status = Password::reset(

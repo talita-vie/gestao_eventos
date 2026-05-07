@@ -24,7 +24,7 @@ class VerifyEmailController extends Controller
         return $this->sendResponse(null, 'Se email estiver cadastrado, um novo link de verificação foi enviado!');
     }
 
-    public function verify(Request $request, $id, $hash) {
+    public function verify(Request $request, string $id, string $hash) {
         $user = User::findOrFail($id);
 
         if(!$user) {

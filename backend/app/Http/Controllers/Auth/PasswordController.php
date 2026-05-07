@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\EmailRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Services\Auth\AuthService;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PasswordController extends Controller
 {
@@ -19,7 +17,7 @@ class PasswordController extends Controller
         try {
             $email = $request->validated();
             $result = $this->authService->sendResetLinkEmail($email);
-            return $this->sendResponse($result, 'Se email estiver cadastrado, um novo link de resetar senha foi enviado!');
+            return $this->sendResponse(null, 'Se email estiver cadastrado, um novo link de resetar senha foi enviado!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }

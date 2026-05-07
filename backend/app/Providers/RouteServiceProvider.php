@@ -42,5 +42,10 @@ class RouteServiceProvider extends ServiceProvider
             $email = $request->input('email');
             return Limit::perMinute(1)->by($email ?: $request->ip());
         });
+
+        RateLimiter::for('forgot-password', function(Request $request) {
+            $email = $request->input('email');
+            return Limit::perMinute(1)->by($email ?: $request->ip());
+        });
     }
 }
