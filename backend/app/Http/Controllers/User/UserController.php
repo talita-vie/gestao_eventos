@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\User;
 
-use AddressInfo;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Address\AddressRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\User\DeleteAccountRequest;
 use App\Services\User\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -19,6 +19,7 @@ class UserController extends Controller
     }
     public function show(Request $request) 
     {
+        Gate::authorize('view', $request->user());
         try {
             $result = $this->userService->showUser($request->user());
             return $this->sendResponse($result, 'Usuário encontrado com sucesso.');
@@ -30,6 +31,7 @@ class UserController extends Controller
 
     public function updateInfo(RegisterRequest $request) 
     {
+        Gate::authorize('update', $request->user());
         try {
             $data = $request->validated();
             $result = $this->userService->updateUserInfo($data, $request->user());
@@ -41,6 +43,7 @@ class UserController extends Controller
 
     public function updateAddress(AddressRequest $request) 
     {
+        Gate::authorize('update', $request->user());
         try {
             $data = $request->validated();
             $result = $this->userService->updateUserAddress($data, $request->user());
@@ -52,6 +55,7 @@ class UserController extends Controller
 
     public function destroy(DeleteAccountRequest $request) 
     {
+        Gate::authorize('delete', $request->user());
         try {
             $result = $this->userService->deleteUser($request->user());
             return $this->sendResponse($result, 'Usuário deletado com sucesso.');
