@@ -2,6 +2,7 @@
 
 namespace App\Services\Event;
 
+use App\Enums\ModerationEvent;
 use App\Enums\UserRole;
 use App\Models\Address;
 use App\Models\Event;
@@ -15,7 +16,7 @@ class EventService
         try {
             $events = Event::published()->where('organizer_id', '!=', $user['id'])
                             ->with('address')
-                            ->paginate(10);
+                            ->get();
 
             if($events->count() === 0) {
                 throw new Exception('No momento não há eventos disponíveis.');
@@ -27,9 +28,20 @@ class EventService
         }
     }
 
-    public function myEvents(User $user) {
+    public function myEvents(User $user, array $data) {
         try {
-            $events = Event::with('address')->where('organizer_id', $user->id)->get();
+            $query = $user->events();
+
+            if (array_key_exists('status', $data)) {
+                $query->with('address')->where('status', $data['status']);
+            }
+
+            if (array_key_exists('moderation_status', $data)) {
+                $query->with('address')->where('moderation_status', $data['moderation_status']);
+            }
+
+            $events = $query->latest()->paginate(20);
+
             return $events;
         } catch (\Throwable $th) {
             throw $th;
@@ -80,14 +92,26 @@ class EventService
         }
     }
 
-    public function updateEvent(Event $event, array $data) {
-        try {
-            $event->update($data);
-            return $event;
+    public function updateEvent(Event $event, array $dataEvent, array $dataAddress) {
 
-        } catch (\Throwable $th) {
-            throw $th;
+        return DB::Transaction(function() use($dataEvent, $dataAddress, $event) {
+
+        $cep = $dataAddress['street_zipcode'];
+         $dataAddress['street_zipcode'] = substr($cep, 0, 5) . substr($cep, 6, 3);
+
+        if(!$event->address_id) {
+            $address = Address::create($dataAddress);
+            $dataEvent['address_id'] = $address->id;
+        } else {
+            $address = Address::findOrFail($event->address_id);
+            $address->update($dataAddress);
         }
+
+        $event->update($dataEvent);
+
+        return $event->load('address');
+    });
+
     }
 
     public function deleteEvent(Event $event) {

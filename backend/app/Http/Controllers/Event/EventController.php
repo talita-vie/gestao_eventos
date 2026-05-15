@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Event;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Event\EventRequest;
+use App\Http\Requests\Event\StatusEventRequest;
 use App\Models\Event;
 use App\Services\Event\EventService;
 use Illuminate\Http\Request;
@@ -26,9 +27,11 @@ class EventController extends Controller
         }
     }
 
-    public function myEvents(Request $request) {
+    public function myEvents(StatusEventRequest $request) {
         try {
-            $result = $this->eventService->myEvents($request->user());
+            $user = $request->user();
+            $data = $request->validated();
+            $result = $this->eventService->myEvents($user, $data);
             return $this->sendResponse($result, 'Meus eventos recuperandos com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
@@ -71,8 +74,9 @@ class EventController extends Controller
         Gate::authorize('update', $event);
 
         try {
-            $data = $request->validated();
-            $result = $this->eventService->updateEvent($event, $data);
+            $dataEvent = $request->getEventData();
+            $dataAddress = $request->getAddressData();
+            $result = $this->eventService->updateEvent($event, $dataEvent, $dataAddress);
             return $this->sendResponse($result, 'Evento atualizado com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);

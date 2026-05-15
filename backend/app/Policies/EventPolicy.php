@@ -36,9 +36,9 @@ class EventPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, Event $event): bool
     {
-        return false;
+        return $user->id === $event->organizer_id;
     }
 
     /**
