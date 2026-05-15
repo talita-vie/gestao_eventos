@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Enums\EducationLevel;
+use App\Enums\UserRole;
 use App\Rules\Cpf;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -41,7 +42,7 @@ class RegisterRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => [
                 'required',
                 'max:60',
@@ -77,5 +78,16 @@ class RegisterRequest extends FormRequest
                 Rule::enum(EducationLevel::class)
             ]
         ];
+
+        if ($this->user()->role->value === UserRole::ADMIN->value) {
+            $rules = [
+                'role' => [
+                    'sometimes',
+                    Rule::enum(UserRole::class)
+                ]
+            ];
+        }
+
+        return $rules;
     }
 }

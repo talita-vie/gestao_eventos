@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Organizer\Registration\RegistrationAdminController;
 use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Event\EventMediaController;
 use App\Http\Controllers\Event\EventStatusController;
+use App\Http\Controllers\Organizer\Certificate\CertificateAdminController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,4 +26,8 @@ Route::prefix('events')->group(function() {
     Route::patch('/{registration}/check-in', [EventStatusController::class, 'checkinParticipants'])->name('checkinParticipants');
     Route::patch('/{registration}/check-in/delete', [EventStatusController::class, 'deleteCheckinParticipants'])->name('deleteCheckinParticipants');
     Route::get('/{event}/finish', [EventStatusController::class, 'finishEvent'])->name('finishEvent');
+
 });
+
+Route::post('/{event}/registration-user', [RegistrationAdminController::class, 'storeAdmin']);
+Route::get('/{event}/certificates-user', [CertificateAdminController::class, 'indexAdmin']);

@@ -47,12 +47,11 @@ class RegistrationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Registration $registration)
+    public function destroy(Registration $registration)
     {
         Gate::authorize('delete', $registration);
         try {
-            $user = $request->user();
-            $result = $this->registrationService->deleteRegistration($user, $registration);
+            $result = $this->registrationService->deleteRegistration($registration);
             return $this->sendResponse($result, 'Inscrição deletada com sucesso.');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
