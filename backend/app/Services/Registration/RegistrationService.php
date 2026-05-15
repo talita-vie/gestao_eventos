@@ -45,13 +45,7 @@ class RegistrationService
             throw new Exception('O período de inscrição nesse evento acabou.');
         }
 
-        
-
-        // fazer logica se o evento é interno ou não -> dd('User: ', $user->institution);
-
         // fazer logica se o evento foi pago
-
-        // verificar se o evento é seu
 
         $registration = $event->registrations()->create([
             'user_id' => $user->id
@@ -60,14 +54,10 @@ class RegistrationService
         return $registration;
     }
 
-    public function deleteRegistration(User $user, Registration $registration)
+    public function deleteRegistration(Registration $registration)
     {
         if ($registration->trashed()) {
             throw new Exception('Essa inscrição já foi cancelada.');
-        }
-
-        if ($registration->user_id !== $user->id) {
-            throw new Exception('Você não tem permissão para cancelar essa inscrição.');
         }
 
         if($registration->event->start_date_time->isPast()) {
