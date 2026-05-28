@@ -13,3 +13,26 @@ export const EducationLevelTypes = {
 }as const;
 
 export type EducationLevel = typeof EducationLevelTypes[keyof typeof EducationLevelTypes];
+
+export const educationLevelOptions = [
+  {
+    value: EducationLevelTypes.EnsinoMedio,
+    label: 'Ensino Médio'
+  },
+  {
+    value: EducationLevelTypes.Graduacao,
+    label: 'Graduação'
+  },
+  {
+    value: EducationLevelTypes.PosGraduacao,
+    label: 'Pós-graduação'
+  },
+  {
+    value: EducationLevelTypes.Mestrado,
+    label: 'Mestrado'
+  },
+  {
+    value: EducationLevelTypes.Doutorado,
+    label: 'Doutorado'
+  }
+];

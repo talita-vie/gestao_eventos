@@ -1,7 +1,7 @@
 export interface Address {
     id: number;
     street_name: string;
-    neighbordhood: string;
+    neighborhood: string;
     city_name: string;
     state: string;
     house_number: string;

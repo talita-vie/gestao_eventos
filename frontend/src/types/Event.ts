@@ -7,7 +7,7 @@ export interface Event {
     id: number;
     name: string;
     description: string;
-    banner_file: string;
+    banner_path: string;
     start_date_time: string;
     end_date_time: string;
     category_id: number;
@@ -22,9 +22,13 @@ export interface Event {
     references_id: number;
     organizer_id: number;
     address_id: number;
+    registration_id: number;
+    is_subscribed: boolean;
+    available_vacancies: number;
+    deleted_at: string;
 
     category?: Category;
     reference?: Event;
-    organizer?: User;
+    user?: User;
     address?: Address;
 }
