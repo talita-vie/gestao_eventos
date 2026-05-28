@@ -31,11 +31,26 @@ function App() {
 
             {/* Menu */}
             <div className="flex items-center gap-4">
+
               <Link
-                to="/"
+                to="/profile"
+                className="hover:underline"
+              >
+                Meu Perfil
+              </Link>
+
+              <Link
+                to="/my-events"
                 className="hover:underline"
               >
                 Meus Eventos
+              </Link>
+
+              <Link
+                to="/my-certificates"
+                className="hover:underline"
+              >
+                Meus Certificados
               </Link>
 
               <button
@@ -50,7 +65,7 @@ function App() {
       )}
 
       {/* Conteúdo */}
-      <main className={isAuthenticated ? 'p-4' : ''}>
+      <main className={isAuthenticated ? '' : ''}>
         <Outlet />
       </main>
     </div>

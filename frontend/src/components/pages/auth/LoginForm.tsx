@@ -1,36 +1,27 @@
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-import {
-  ArrowRight,
-  IdCard,
-  Lock,
-  Mail,
-  RefreshCw,
-  User,
-  UserPlus,
-} from "lucide-react";
+import { ArrowRight, Lock, Mail, LogIn, Eye, EyeOff } from "lucide-react";
 
 import { api } from "../../../services/api";
+
 import { useNavigate, Link } from "react-router-dom";
+
 import { isAxiosError } from "axios";
+import { useState } from "react";
 
-const registerSchema = z.object({
-    name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
-    cpf: z.string().min(11, "O CPF deve ser válido"),
-    email: z.string().email("Digite um e-mail válido"),
-    password: z.string().min(8, "A senha deve conter pelo menos 8 caracteres"),
-    password_confirmation: z.string(),
-  })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "As senhas não coincidem",
-    path: ["password_confirmation"],
-  });
+const loginSchema = z.object({
+  email: z.string().email("Digite um e-mail válido"),
 
-type RegisterFormData = z.infer<typeof registerSchema>;
+  password: z.string().min(1, "A senha é obrigatória"),
+});
 
-export function RegisterForm() {
+type LoginFormData = z.infer<typeof loginSchema>;
+
+
+export function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -38,57 +29,67 @@ export function RegisterForm() {
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   });
 
-
-  async function onSubmit(data: RegisterFormData) {
+  async function onSubmit(data: LoginFormData) {
     try {
-      const response = await api.post("/register", data);
+      const response = await api.post("/login", data);
 
-      console.log(response.data);
+      const token = response.data.data.token;
 
-      alert("Conta criada com sucesso!");
+      const user = response.data.data.user;
 
-      navigate("/login");
+      if (token) {
+        localStorage.setItem("@Eventos:token", token);
+
+        localStorage.setItem("@Eventos:user", JSON.stringify(user));
+
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      }
+
+      navigate("/");
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         const responseData = error.response.data;
-        console.log(responseData)
-      
-        let errorMensage = 'E-mail ou senha incorretos.';
-      
-        if (responseData.message) {
-          errorMensage = responseData.message;
+
+        let errorMessage = "E-mail ou senha incorretos.";
+
+        if (responseData.errors && responseData.errors.length > 0) {
+          errorMessage = responseData.errors[0];
         }
-      
-          setError('root', { message: errorMensage });
-        } else {
-          setError('root', {message: 'Não foi possivel conectar ao servidor.'});
-        }
+
+        setError("root", {
+          message: errorMessage,
+        });
+      } else {
+        setError("root", {
+          message: "Não foi possível conectar ao servidor.",
+        });
+      }
     }
   }
 
   return (
     <div className="min-h-screen flex selection:bg-blue-100">
-      {/* Left Sidebar */}
+      {/* Sidebar */}
       <div className="hidden md:flex md:w-5/12 bg-blue-600 flex-col justify-center items-center p-12 text-center text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 opacity-50"></div>
 
         <div className="absolute top-[-20%] right-[-10%] w-96 h-96 rounded-full bg-white/10 blur-3xl"></div>
 
         <div className="bg-white/20 p-6 rounded-2xl mb-8 backdrop-blur-sm shadow-xl border border-white/20 z-10">
-          <UserPlus size={48} strokeWidth={1.5} />
+          <LogIn size={48} strokeWidth={1.5} />
         </div>
 
         <h1 className="text-4xl font-bold mb-4 tracking-tight z-10">
-          Bem-vindo!
+          Bem-vindo de volta!
         </h1>
 
         <p className="text-lg text-blue-50/90 max-w-sm leading-relaxed z-10">
-          Junte-se a nós para acessar todos os recursos exclusivos da plataforma
-          SecureAuth.
+          Faça login para acessar a plataforma e continuar gerenciando seus
+          eventos.
         </p>
       </div>
 
@@ -104,77 +105,15 @@ export function RegisterForm() {
           <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] p-8 md:p-10 border border-slate-100">
             <div className="mb-8 text-center">
               <h2 className="text-2xl font-bold text-slate-800 mb-2">
-                Crie a sua conta
+                Entrar na conta
               </h2>
 
               <p className="text-slate-500 text-sm">
-                Preencha os dados abaixo para começar.
+                Digite seus dados para continuar.
               </p>
             </div>
 
             <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-              {/* Nome */}
-              <div>
-                <label
-                  className="text-sm font-semibold text-slate-700 block mb-1.5 ml-1"
-                  htmlFor="name"
-                >
-                  Nome Completo
-                </label>
-
-                <div className="group relative">
-                  <User
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"
-                    size={18}
-                  />
-
-                  <input
-                    type="text"
-                    id="name"
-                    placeholder="Ex: João Silva"
-                    {...register("name")}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-slate-700 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                  />
-                </div>
-
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              {/* CPF */}
-              <div>
-                <label
-                  className="text-sm font-semibold text-slate-700 block mb-1.5 ml-1"
-                  htmlFor="cpf"
-                >
-                  CPF
-                </label>
-
-                <div className="group relative">
-                  <IdCard
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"
-                    size={18}
-                  />
-
-                  <input
-                    type="text"
-                    id="cpf"
-                    placeholder="000.000.000-00"
-                    {...register("cpf")}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-slate-700 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                  />
-                </div>
-
-                {errors.cpf && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.cpf.message}
-                  </p>
-                )}
-              </div>
-
               {/* Email */}
               <div>
                 <label
@@ -206,7 +145,7 @@ export function RegisterForm() {
                 )}
               </div>
 
-              {/* Senha */}
+              {/* Password */}
               <div>
                 <label
                   className="text-sm font-semibold text-slate-700 block mb-1.5 ml-1"
@@ -222,12 +161,15 @@ export function RegisterForm() {
                   />
 
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     id="password"
                     placeholder="••••••••"
-                    {...register("password")}
+                    {...register('password')}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-slate-700 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                   />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
                 </div>
 
                 {errors.password && (
@@ -236,52 +178,41 @@ export function RegisterForm() {
                   </p>
                 )}
               </div>
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
 
-              {/* Confirmar senha */}
-              <div>
-                <label
-                  className="text-sm font-semibold text-slate-700 block mb-1.5 ml-1"
-                  htmlFor="password_confirmation"
-                >
-                  Confirmar Senha
+                  <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">
+                    Lembrar-me
+                  </span>
                 </label>
 
-                <div className="group relative">
-                  <RefreshCw
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"
-                    size={18}
-                  />
-
-                  <input
-                    type="password"
-                    id="password_confirmation"
-                    placeholder="••••••••"
-                    {...register("password_confirmation")}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-slate-700 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                  />
-                </div>
-
-                {errors.password_confirmation && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.password_confirmation.message}
-                  </p>
-                )}
+                <Link
+                  to="/forgot-password"
+                  className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                  Esqueceu a senha?
+                </Link>
               </div>
 
+              {/* API Error */}
               {errors.root && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red 600 text-sm rounded-lg text-center font-medium">
+                <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl p-3 text-center">
                   {errors.root.message}
                 </div>
               )}
 
-              {/* Botão */}
+              {/* Submit */}
               <div className="pt-4">
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white font-bold py-3.5 rounded-xl transition-all duration-300 flex justify-center items-center gap-2 group shadow-lg shadow-blue-200 active:scale-[0.98]"
                 >
-                  {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+                  {isSubmitting ? "Entrando..." : "Entrar"}
 
                   <ArrowRight
                     size={18}
@@ -291,15 +222,15 @@ export function RegisterForm() {
               </div>
             </form>
 
-            {/* Login */}
+            {/* Footer */}
             <div className="mt-8 text-center">
               <p className="text-sm text-slate-500">
-                Já tem uma conta?{" "}
+                Não possui uma conta?{" "}
                 <Link
-                  to="/login"
+                  to="/register"
                   className="font-bold text-blue-600 hover:text-blue-700 transition-colors"
                 >
-                  Faça login
+                  Cadastre-se
                 </Link>
               </p>
             </div>
