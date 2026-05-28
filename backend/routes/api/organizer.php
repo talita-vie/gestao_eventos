@@ -25,7 +25,7 @@ Route::prefix('events')->group(function() {
     Route::get('/{event}/participants', [EventStatusController::class, 'participantsEvent'])->name('participantsEvent');
     Route::patch('/{registration}/check-in', [EventStatusController::class, 'checkinParticipants'])->name('checkinParticipants');
     Route::patch('/{registration}/check-in/delete', [EventStatusController::class, 'deleteCheckinParticipants'])->name('deleteCheckinParticipants');
-    Route::get('/{event}/finish', [EventStatusController::class, 'finishEvent'])->name('finishEvent');
+    Route::patch('/{event}/finish', [EventStatusController::class, 'finishEvent'])->name('finishEvent');
 
 });
 

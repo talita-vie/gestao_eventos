@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Address\AddressRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\User\DeleteAccountRequest;
+use App\Http\Requests\User\UpdateInfoRequest;
+use App\Http\Requests\User\UpdatePasswordRequest;
 use App\Services\User\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -29,13 +31,25 @@ class UserController extends Controller
 
     }
 
-    public function updateInfo(RegisterRequest $request) 
+    public function updateInfo(UpdateInfoRequest $request) 
     {
         Gate::authorize('update', $request->user());
         try {
             $data = $request->validated();
             $result = $this->userService->updateUserInfo($data, $request->user());
             return $this->sendResponse($result, 'Informações do usuário atualizadas com sucesso.');
+        } catch (\Throwable $th) {
+            return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
+        }
+    }
+
+    public function updatePassword(UpdatePasswordRequest $request) 
+    {
+        Gate::authorize('update', $request->user());
+        try {
+            $data = $request->validated();
+            $result = $this->userService->updateUserPassword($data, $request->user());
+            return $this->sendResponse($result, 'Senha do usuário atualizada com sucesso.');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
         }

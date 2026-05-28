@@ -5,7 +5,9 @@ namespace App\Services\User;
 use App\Models\Address;
 use App\Models\User;
 use Carbon\Carbon;
+use ErrorException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
@@ -17,6 +19,17 @@ class UserService
 
     public function updateUserInfo(array $data, User $user)
     {
+        $data['phone'] = substr($data['phone'], 1, 2) . substr($data['phone'], 4, 5) . substr($data['phone'], 10, 13);
+
+        $user->update($data);
+
+        return $user;
+    }
+
+    public function updateUserPassword(array $data, User $user)
+    {
+        $data['password'] = Hash::make($data['password']);
+
         $user->update($data);
 
         return $user;

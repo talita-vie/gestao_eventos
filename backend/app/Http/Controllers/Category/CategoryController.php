@@ -27,7 +27,7 @@ class CategoryController extends Controller
         }
     }
 
-    public function DeletedCategory()
+    public function deletedCategory()
     {
         try {
             $result = $this->categoryService->DeletedCategory();

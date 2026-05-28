@@ -66,7 +66,7 @@ class AuthService
             throw new AccessDeniedHttpException('Email ou Senha inválidos!');
         }
 
-        $this->checkVerificationUser($user);
+        //$this->checkVerificationUser($user);
 
         $sucess['token'] = $user->createToken('auth_token')->plainTextToken;
         $sucess['user'] = $user;

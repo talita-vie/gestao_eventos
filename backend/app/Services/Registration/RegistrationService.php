@@ -17,6 +17,24 @@ class RegistrationService
         return $registrations;
     }
 
+    public function myRegistrations(User $user)
+    {
+        $participation = $user->registrations()
+                    ->with(['event.user'])
+                    ->latest()
+                    ->paginate(12);
+        
+        
+        $participation->through(function ($registration) {
+            $events = $registration->event;
+            $events->user = $registration->user;
+
+            return $events;
+        });
+
+        return $participation;
+    }
+
     public function storeRegistration(User $user, Event $event)
     {
         $registrationWithTrash = $event->registrations()

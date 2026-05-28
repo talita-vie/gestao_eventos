@@ -1,17 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\User;
 
 use App\Enums\EducationLevel;
-use App\Enums\UserRole;
 use App\Rules\Cpf;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
-class RegisterRequest extends FormRequest
+class UpdateInfoRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -43,7 +40,9 @@ class RegisterRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        $userId = $this->user()->id;
+
+        return [
             'name' => [
                 'required',
                 'max:60',
@@ -52,17 +51,13 @@ class RegisterRequest extends FormRequest
             'email' => [
                 'required',
                 'email',
-                'max:100'
-            ],
-            'password' => [
-                'required',
-                'confirmed',
-                Password::min(8)->uncompromised(),
-                'max:128'
+                'max:100',
+                Rule::unique('users', 'email')->ignore($userId)
             ],
             'cpf' => [
                 'required',
-                new Cpf()
+                new Cpf(),
+                Rule::unique('users', 'cpf')->ignore($userId)
             ],
             'phone' => [
                 'nullable',
@@ -79,16 +74,5 @@ class RegisterRequest extends FormRequest
                 Rule::enum(EducationLevel::class)
             ]
         ];
-
-        if (Auth::check() && Auth::user()->role->value === UserRole::ADMIN->value) {
-            $rules = [
-                'role' => [
-                    'sometimes',
-                    Rule::enum(UserRole::class)
-                ]
-            ];
-        }
-
-        return $rules;
     }
 }

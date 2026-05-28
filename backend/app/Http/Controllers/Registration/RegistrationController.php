@@ -30,6 +30,17 @@ class RegistrationController extends Controller
         }
     }
 
+    public function myRegistration(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $result = $this->registrationService->myRegistrations($user);
+            return $this->sendResponse($result, 'Minhas inscrições encontradas com sucesso.');
+        } catch (\Throwable $th) {
+            return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */

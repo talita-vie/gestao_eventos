@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Event;
+namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
-class UploadBannerRequest extends FormRequest
+class UpdatePasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +24,18 @@ class UploadBannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'banner' => [
+            'current_password' => [
                 'required',
-                'image',
-                'mimes:png,jpg,jpeg,webp',
-                'max:5120'
-            ]
+                'string',
+                'current_password'
+            ],
+            'password' => [
+                'required',
+                'confirmed',
+                Password::min(8)->uncompromised(),
+                'max:128',
+                'different:current_password'
+            ],
         ];
     }
 }

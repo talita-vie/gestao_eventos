@@ -14,8 +14,8 @@ Route::prefix('events')->group(function() {
 });
 
 
-Route::apiResource('category', CategoryController::class); 
+Route::apiResource('category', CategoryController::class)->except('index'); 
 Route::prefix('categories')->group(function() {
     Route::patch('/{id}/restore', [CategoryController::class, 'restoreCategory'])->name('restoreCategory');
-    Route::get('/trashed', [CategoryController::class, 'DeletedCategory'])->name('DeletedCategory');
+    Route::get('/trashed', [CategoryController::class, 'deletedCategory'])->name('deletedCategory');
 });

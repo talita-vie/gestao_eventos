@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\UserRole;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user/{userRole}', function (UserRole $userRole) {

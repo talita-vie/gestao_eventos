@@ -8,6 +8,7 @@ use App\Models\Address;
 use App\Models\Event;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EventService
@@ -16,12 +17,9 @@ class EventService
         try {
             $events = Event::published()->where('organizer_id', '!=', $user['id'])
                             ->with('address')
+                            ->with('user')
                             ->get();
 
-            if($events->count() === 0) {
-                throw new Exception('No momento não há eventos disponíveis.');
-            }
-            
             return $events;
         } catch (\Throwable $th) {
             throw $th;
@@ -40,7 +38,7 @@ class EventService
                 $query->with('address')->where('moderation_status', $data['moderation_status']);
             }
 
-            $events = $query->latest()->paginate(20);
+            $events = $query->with('user')->latest()->paginate(12);
 
             return $events;
         } catch (\Throwable $th) {
@@ -52,7 +50,7 @@ class EventService
         try {
             $events = Event::onlyTrashed()
                             ->where('organizer_id', $user->id)
-                            ->get();
+                            ->paginate(15);
             
             return $events;
         } catch (\Throwable $th) {
@@ -85,7 +83,18 @@ class EventService
 
     public function findEvent(string $id) {
         try {
-            $event = Event::findOrFail($id);
+            $event = Event::with(['address', 'user'])->withTrashed()->findOrFail($id);
+            $userId = Auth::id();
+            $subscribed = $event->registrations()->where('user_id', $userId)->first();
+
+            if ($subscribed) {
+                $event->is_subscribed = $subscribed->exists;
+                $event->registration_id = $subscribed->id;
+                }
+                
+                $count = $event->registrations()->count();
+                $event->available_vacancies = $event->capacity - $count;
+
             return $event;
         } catch (\Throwable $th) {
             throw $th;
