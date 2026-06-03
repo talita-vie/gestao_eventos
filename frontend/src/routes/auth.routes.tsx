@@ -6,19 +6,19 @@ import { ResetPasswordForm } from "../components/pages/auth/ResetPasswordForm"
 
 export const authRoutes: RouteObject[] = [
     {
-        path: '/login',
+        path: 'login',
         element: <LoginForm />
     },
     {
-        path: '/register',
+        path: 'register',
         element: <RegisterForm />
     },
     {
-        path: '/forgot-password',
+        path: 'forgot-password',
         element: <ForgotPasswordForm />
     },
     {
-        path: '/reset-password',
+        path: 'reset-password',
         element: <ResetPasswordForm />
     }
 

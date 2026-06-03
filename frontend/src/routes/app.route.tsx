@@ -10,7 +10,7 @@ import { MyCertificates } from "../components/pages/certificate/MyCertificates";
 
 export const appRoutes: RouteObject[] = [
     {
-        path: '/',
+        path: '',
         element: <Home />
     },
     {
@@ -34,7 +34,7 @@ export const appRoutes: RouteObject[] = [
         element: <EditEvent />
     },
     {
-        path: '/organizer/events/:id/participants',
+        path: 'organizer/events/:id/participants',
         element: <EventParticipants />
     },
     {
