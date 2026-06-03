@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Registration;
 use App\Services\Event\EventLifecycleService;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Gate;
 
 class EventStatusController extends Controller
@@ -34,6 +35,7 @@ class EventStatusController extends Controller
 
         try {
             $result = $this->eventLifecycleService->publishEvent($event);
+
             return $this->sendResponse($result, 'Evento publicado com sucesso!');
         } catch (\Throwable $th) {
             return $this->sendError('Erro generico: ', [0 => $th->getMessage()]);
