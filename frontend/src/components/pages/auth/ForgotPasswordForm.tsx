@@ -10,7 +10,7 @@ import { ChevronLeft, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email("Digite um e-mail válido"),
+  email: z.email("Digite um e-mail válido"),
 });
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
@@ -22,7 +22,6 @@ export function ForgotPasswordForm() {
     handleSubmit,
     setError,
     reset,
-
     formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),

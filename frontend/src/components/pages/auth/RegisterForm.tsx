@@ -16,10 +16,11 @@ import { api } from "../../../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { isAxiosError } from "axios";
 
-const registerSchema = z.object({
+const registerSchema = z
+  .object({
     name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
     cpf: z.string().min(11, "O CPF deve ser válido"),
-    email: z.string().email("Digite um e-mail válido"),
+    email: z.email("Digite um e-mail válido"),
     password: z.string().min(8, "A senha deve conter pelo menos 8 caracteres"),
     password_confirmation: z.string(),
   })
@@ -42,12 +43,9 @@ export function RegisterForm() {
     resolver: zodResolver(registerSchema),
   });
 
-
   async function onSubmit(data: RegisterFormData) {
     try {
-      const response = await api.post("/register", data);
-
-      console.log(response.data);
+      await api.post("/register", data);
 
       alert("Conta criada com sucesso!");
 
@@ -55,16 +53,16 @@ export function RegisterForm() {
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         const responseData = error.response.data;
-      
-        let errorMensage = 'E-mail ou senha incorretos.';
-      
+
+        let errorMensage = "Erro ao criar conta, tente novamente.";
+
         if (responseData.errors) {
           errorMensage = responseData.errors;
         }
-          setError('root', { message: errorMensage });
-        } else {
-          setError('root', {message: 'Não foi possivel conectar ao servidor.'});
-        }
+        setError("root", { message: errorMensage });
+      } else {
+        setError("root", { message: "Não foi possivel conectar ao servidor." });
+      }
     }
   }
 
@@ -95,7 +93,9 @@ export function RegisterForm() {
         <div className="w-full max-w-md">
           {/* Mobile Header */}
           <header className="md:hidden mb-8 text-center">
-            <h1 className="text-3xl font-bold text-blue-600">SecureAuth</h1>
+            <h1 className="text-3xl font-bold text-blue-600">
+              Gestão de Eventos
+            </h1>
           </header>
 
           {/* Card */}
@@ -302,25 +302,6 @@ export function RegisterForm() {
               </p>
             </div>
           </div>
-
-          {/* Footer */}
-          <footer className="mt-10 flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-400 px-2 space-y-4 md:space-y-0">
-            <p>© 2024 SecureAuth Inc. Todos os direitos reservados.</p>
-
-            <div className="flex gap-4">
-              <a href="#" className="hover:text-blue-500 transition-colors">
-                Privacidade
-              </a>
-
-              <a href="#" className="hover:text-blue-500 transition-colors">
-                Termos
-              </a>
-
-              <a href="#" className="hover:text-blue-500 transition-colors">
-                Suporte
-              </a>
-            </div>
-          </footer>
         </div>
       </main>
     </div>

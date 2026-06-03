@@ -8,7 +8,6 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { isAxiosError } from 'axios';
 import { api } from '../../../services/api';
 
-// 1. O MOTOR DE VALIDAÇÃO (ZOD)
 const resetSchema = z.object({
   password: z.string().min(8, 'A nova senha deve ter pelo menos 8 caracteres'),
   confirmPassword: z.string()
@@ -19,7 +18,6 @@ const resetSchema = z.object({
 
 type ResetFormData = z.infer<typeof resetSchema>;
 
-// 2. EXPORTAÇÃO CORRETA PARA O NOSSO ROTEADOR
 export function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,10 +26,8 @@ export function ResetPasswordForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
-  // Pegamos os parâmetros vitais da URL
   const token = searchParams.get('token');
   const email = searchParams.get('email');
-  console.log(email)
 
   const {
     register,
@@ -42,7 +38,6 @@ export function ResetPasswordForm() {
     resolver: zodResolver(resetSchema)
   });
 
-  // 3. A COMUNICAÇÃO REAL COM O LARAVEL
   const onSubmit = async (data: ResetFormData) => {
     if (!token || !email) {
       setError('root', { message: 'Link de recuperação inválido ou expirado.' });
@@ -54,10 +49,9 @@ export function ResetPasswordForm() {
         email: email,
         token: token,
         password: data.password,
-        password_confirmation: data.confirmPassword // Laravel espera esse nome
+        password_confirmation: data.confirmPassword
       });
       
-      // Se deu certo, mostramos a tela verde linda do Stitch!
       setIsSuccess(true);
       
     } catch (error) {
@@ -69,7 +63,6 @@ export function ResetPasswordForm() {
     }
   };
 
-  // TELA DE SUCESSO DO STITCH (Mantida intacta, só ajustamos a navegação)
   if (isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6 font-sans">
@@ -92,7 +85,6 @@ export function ResetPasswordForm() {
     );
   }
 
-  // TELA DO FORMULÁRIO
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6 font-sans">
       <div className="w-full max-w-md">

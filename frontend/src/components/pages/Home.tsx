@@ -9,7 +9,6 @@ export function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
     async function fetchEvents() {
       try {

@@ -7,22 +7,22 @@ import { ArrowRight, Lock, Mail, LogIn, Eye, EyeOff } from "lucide-react";
 import { api } from "../../../services/api";
 
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
 
 import { isAxiosError } from "axios";
 import { useState } from "react";
 
 const loginSchema = z.object({
-  email: z.string().email("Digite um e-mail válido"),
-
+  email: z.email("Digite um e-mail válido"),
   password: z.string().min(1, "A senha é obrigatória"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { setAuthenticated } = useAuth();
 
   const {
     register,
@@ -38,15 +38,14 @@ export function LoginForm() {
       const response = await api.post("/login", data);
 
       const token = response.data.data.token;
-
       const user = response.data.data.user;
 
       if (token) {
         localStorage.setItem("@Eventos:token", token);
-
         localStorage.setItem("@Eventos:user", JSON.stringify(user));
 
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        setAuthenticated(true);
       }
 
       navigate("/");
@@ -161,15 +160,19 @@ export function LoginForm() {
                   />
 
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     id="password"
                     placeholder="••••••••"
-                    {...register('password')}
+                    {...register("password")}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-slate-700 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                 </div>
 
                 {errors.password && (
@@ -222,7 +225,6 @@ export function LoginForm() {
               </div>
             </form>
 
-            {/* Footer */}
             <div className="mt-8 text-center">
               <p className="text-sm text-slate-500">
                 Não possui uma conta?{" "}
@@ -235,25 +237,6 @@ export function LoginForm() {
               </p>
             </div>
           </div>
-
-          {/* Footer */}
-          <footer className="mt-10 flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-400 px-2 space-y-4 md:space-y-0">
-            <p>© 2024 SecureAuth Inc. Todos os direitos reservados.</p>
-
-            <div className="flex gap-4">
-              <a href="#" className="hover:text-blue-500 transition-colors">
-                Privacidade
-              </a>
-
-              <a href="#" className="hover:text-blue-500 transition-colors">
-                Termos
-              </a>
-
-              <a href="#" className="hover:text-blue-500 transition-colors">
-                Suporte
-              </a>
-            </div>
-          </footer>
         </div>
       </main>
     </div>
