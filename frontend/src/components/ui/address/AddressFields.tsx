@@ -1,4 +1,3 @@
-// src/components/ui/forms/AddressFields.tsx
 import type { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { maskCEP } from '../../../utils/masks';
 import { BRAZIL_STATES } from '../../../constants/states';
@@ -28,7 +27,6 @@ export function AddressFields({ register, errors, watch, setValue, prefix = '' }
           const data = await response.json();
 
           if (!data.erro) {
-            // Usando o setValue repassado pelas props
             setValue(`${prefix}street_name`, data.logradouro, { shouldValidate: true});
             setValue(`${prefix}neighborhood`, data.bairro, { shouldValidate: true});
             setValue(`${prefix}city_name`, data.localidade, { shouldValidate: true});

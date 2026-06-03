@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../services/api";
 import { Link } from "react-router-dom";
-import { Ticket, Crown, Trash2 } from "lucide-react"; // 👈 Importamos o ícone de lixeira
+import { Ticket, Crown, Trash2 } from "lucide-react";
 import type { Event } from "../../../types/Event";
 import { isAxiosError } from "axios";
 import { CardEvents } from "../../ui/events/CardEvents";
@@ -21,14 +21,13 @@ const initialState: PaginatedState = {
 };
 
 export function MyEvents() {
-  // 1. Adicionamos 'trashed' como opção de aba
   const [activeTab, setActiveTab] = useState<"participant" | "organizer" | "trashed">(
     "participant"
   );
 
   const [participating, setParticipating] = useState<PaginatedState>(initialState);
   const [organized, setOrganized] = useState<PaginatedState>(initialState);
-  const [trashed, setTrashed] = useState<PaginatedState>(initialState); // 👈 Novo estado para a lixeira
+  const [trashed, setTrashed] = useState<PaginatedState>(initialState);
 
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -48,8 +47,6 @@ export function MyEvents() {
     async function loadInitialEvents() {
       try {
         setLoading(true);
-
-        // 1. Inscrições
         try {
           const registrationsRes = await api.get("/registrations-me?page=1");
           setParticipating(extractPagination(registrationsRes));
@@ -57,8 +54,6 @@ export function MyEvents() {
           console.error("Erro ao carregar inscrições:", regError);
           setParticipating(initialState);
         }
-
-        // 2. Eventos Organizados Ativos
         try {
           const organizedRes = await api.get("/organizer/events/me?page=1");
           setOrganized(extractPagination(organizedRes));
@@ -72,7 +67,6 @@ export function MyEvents() {
         }
 
         try {
-
           const trashedRes = await api.get("/organizer/events/trashed?page=1"); 
           setTrashed(extractPagination(trashedRes));
         } catch (trashError) {
