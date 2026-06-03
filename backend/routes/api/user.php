@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Certificate\CertificateController;
 use App\Http\Controllers\Event\EventController;
+use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Registration\RegistrationController;
 use App\Http\Controllers\User\UserController;
 use App\Models\User;
@@ -40,4 +41,10 @@ Route::get('/category', [CategoryController::class, 'index']);
 Route::prefix('certificate')->group(function() {
     Route::get('/me', [CertificateController::class, 'allCertificates'])->name('allCertificates');
     Route::get('/{certificate}/view', [CertificateController::class, 'viewCertificate'])->name('viewCertificate');
+});
+
+Route::prefix('notifications')->group(function() {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
 });

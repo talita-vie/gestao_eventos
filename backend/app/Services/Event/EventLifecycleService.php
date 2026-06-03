@@ -5,9 +5,11 @@ namespace App\Services\Event;
 use App\Enums\StatusEvent;
 use App\Models\Event;
 use App\Models\Registration;
+use App\Notifications\ParticipantEventNotification;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class EventLifecycleService
@@ -36,6 +38,14 @@ class EventLifecycleService
             'status' => StatusEvent::PUBLISHED->value,
             'published_at' => now()
         ]);
+
+        $participants = $event->confirmedParticipants;
+        if($participants->isNotEmpty()) {
+            Notification::send(
+                $participants,
+                new ParticipantEventNotification($event, StatusEvent::PUBLISHED->value)
+            );
+        }
         
         return $event;
     }
@@ -57,6 +67,14 @@ class EventLifecycleService
         $event->update([
             'status' => StatusEvent::PAUSED->value,
         ]);
+
+        $participants = $event->confirmedParticipants;
+        if($participants->isNotEmpty()) {
+            Notification::send(
+                $participants,
+                new ParticipantEventNotification($event, StatusEvent::PAUSED->value)
+            );
+        }
         
         return $event;
     }
@@ -78,6 +96,14 @@ class EventLifecycleService
         $event->update([
             'status' => StatusEvent::CANCELED->value,
         ]);
+
+        $participants = $event->confirmedParticipants;
+        if($participants->isNotEmpty()) {
+            Notification::send(
+                $participants,
+                new ParticipantEventNotification($event, StatusEvent::CANCELED->value)
+            );
+        }
         
         return $event;
     }
@@ -129,9 +155,9 @@ class EventLifecycleService
             throw new Exception('Esse evento já foi finalizado pelo organizador.');
         }
 
-        if (Carbon::parse($event->end_date_time)->isFuture()) {
-            throw new Exception('Não é possível finalizar um evento que ainda não acabou.');
-        }
+        // if (Carbon::parse($event->end_date_time)->isFuture()) {
+        //     throw new Exception('Não é possível finalizar um evento que ainda não acabou.');
+        // }
 
         return DB::transaction(function() use($event) {
 
@@ -154,6 +180,14 @@ class EventLifecycleService
                         'participant_name_snapshot' => $registration->user->name,
                         'issue_date' => now()
                     ]
+                );
+            }
+
+            $participants = $event->confirmedParticipants;
+            if($participants->isNotEmpty()) {
+                Notification::send(
+                    $participants,
+                    new ParticipantEventNotification($event, StatusEvent::FINISHED->value)
                 );
             }
 
